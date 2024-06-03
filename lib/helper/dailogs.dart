@@ -17,5 +17,6 @@ class Dailogs{
     showDialog(context: context, builder: (_) => const Center(child: CircularProgressIndicator()) );
 
   }
+
 }
 

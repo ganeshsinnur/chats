@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,10 +27,10 @@ class _SplashScreenState extends State<SplashScreen>{
     Future.delayed(Duration(milliseconds: 1500),(){
 
       //exits from full screen
-      //SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+     // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       //seting color of statur bar
 
-      //SystemChrome.setEnabledSystemUIMode(SystemUiOverlayStyle(statusBarColor: Colors.transparent) as SystemUiMode);
+      //SystemChrome.setEnabledSystemUIMode(const SystemUiOverlayStyle(systemNavigationBarColor: Colors.green,statusBarColor: Colors.green) as SystemUiMode );
       if(APIs.auth.currentUser != null){
         log('\nUsers: ${APIs.auth.currentUser}');
 

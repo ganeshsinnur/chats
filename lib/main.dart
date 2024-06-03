@@ -20,8 +20,10 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+
   @override
   Widget build(BuildContext context) {
+    //var mq=MediaQuery.of(context).size;
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Intelli Chat',
