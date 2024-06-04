@@ -58,9 +58,7 @@ class _ChatScreen extends State<ChatScreen>{
               automaticallyImplyLeading: false,
               flexibleSpace:_appBar() ,
             ),
-            body:
-
-            Column(
+            body:Column(
               children: [
                 Expanded(
                   child: StreamBuilder(
@@ -76,15 +74,15 @@ class _ChatScreen extends State<ChatScreen>{
                         //if some or all data is loaded then show it
                           case ConnectionState.active:
                           case ConnectionState.done:
-                             final data = snapshot.data?.docs;
+                            final data = snapshot.data?.docs;
                             _list = data?.map((e) => Message.fromJson(e.data())).toList() ?? [];
                             _list.sort((b, a) => a.sent.compareTo(b.sent));
 
 
-                        //final _list =["Hello","Hi"];
-                        //      _list.clear();
-                        //      _list.add(Message(msg: 'Hiii', read: '', told: 'XYZ', type: Type.text, fromId: APIs.user.uid, sent: '12:00 AM'));
-                        //      _list.add(Message(msg: 'Hello', read: '', told: APIs.user.uid, type: Type.text, fromId: 'XYZ', sent:' 12:05 AM'));
+                            //final _list =["Hello","Hi"];
+                            //      _list.clear();
+                            //      _list.add(Message(msg: 'Hiii', read: '', told: 'XYZ', type: Type.text, fromId: APIs.user.uid, sent: '12:00 AM'));
+                            //      _list.add(Message(msg: 'Hello', read: '', told: APIs.user.uid, type: Type.text, fromId: 'XYZ', sent:' 12:05 AM'));
 
                             if (_list.isNotEmpty) {
                               return ListView.builder(
@@ -107,17 +105,17 @@ class _ChatScreen extends State<ChatScreen>{
                 ),
 
                 if(_isUploading)
-                const Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10,vertical: 18),
-                      child: CupertinoActivityIndicator(
-                        animating: true,
-                        radius: 30,
-                        //strokeWidth: 2,
-                        color: Colors.blue,
-                      ),
-                    )),
+                  const Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 18),
+                        child: CupertinoActivityIndicator(
+                          animating: true,
+                          radius: 30,
+                          //strokeWidth: 2,
+                          color: Colors.blue,
+                        ),
+                      )),
 
                 // const Align(
                 //   alignment: Alignment.centerRight,
@@ -132,29 +130,31 @@ class _ChatScreen extends State<ChatScreen>{
                 //import 'package:flutter/foundation.dart' as foundation;
                 if(_showemoji)
                   SizedBox(
-                  height: MediaQuery.sizeOf(context).height*0.40,
-                  child: EmojiPicker(
-                    textEditingController: _textController, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
-                    config: Config(
-                      checkPlatformCompatibility: true,
-                      emojiViewConfig: EmojiViewConfig(
-                        columns: 8,
-                        backgroundColor: Colors.black12,
-                        // Issue: https://github.com/flutter/flutter/issues/28894
-                        emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ?  1.20 :  1.0),
+                    height: MediaQuery.sizeOf(context).height*0.40,
+                    child: EmojiPicker(
+                      textEditingController: _textController, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
+                      config: Config(
+                        checkPlatformCompatibility: true,
+                        emojiViewConfig: EmojiViewConfig(
+                          columns: 8,
+                          backgroundColor: Colors.black12,
+                          // Issue: https://github.com/flutter/flutter/issues/28894
+                          emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ?  1.20 :  1.0),
+                        ),
+                        //swapCategoryAndBottomBar:  false,
+                        //skinToneConfig: const SkinToneConfig(),
+                        //categoryViewConfig: const CategoryViewConfig(),
+                        //bottomActionBarConfig: const BottomActionBarConfig(),
+                        //searchViewConfig: const SearchViewConfig(),
                       ),
-                      //swapCategoryAndBottomBar:  false,
-                      //skinToneConfig: const SkinToneConfig(),
-                      //categoryViewConfig: const CategoryViewConfig(),
-                      //bottomActionBarConfig: const BottomActionBarConfig(),
-                      //searchViewConfig: const SearchViewConfig(),
                     ),
-                  ),
-                )
+                  )
 
 
               ],
             )
+
+
 
 
           ),
@@ -204,25 +204,18 @@ class _ChatScreen extends State<ChatScreen>{
                 width: mq.height*.05,
                 height: mq.height*.05,
                 imageUrl: list.isNotEmpty ? list[0].image : widget.user.image,
-                placeholder: (context, url) => CircularProgressIndicator(),
+                placeholder: (context, url) => const CircularProgressIndicator(),
                 errorWidget: (context, url, error) => const CircleAvatar(child: Icon(CupertinoIcons.person_crop_square),),
               ),
             ),
-            SizedBox(width: 10,),
+            const SizedBox(width: 10,),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(list.isNotEmpty ? list[0].name : widget.user.name,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18),),
-                Text(list.isNotEmpty
-        ? list[0].isOnline
-        ? 'Online'
-            : myDateUtil.getLastActiveTime(
-        context: context,
-        lastActive: list[0].lastActive)
-            : myDateUtil.getLastActiveTime(
-        context: context,
-        lastActive: widget.user.lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),)
+                Text(list.isNotEmpty ? list[0].name : widget.user.name,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18),),
+               // Text(list.isNotEmpty ? list[0].isOnline ? 'Online' : myDateUtil.getLastActiveTime(context: context, lastActive: list[0].lastActive)// : myDateUtil.getLastActiveTime(context: context, lastActive: widget.user.lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),)
+                list.isNotEmpty ? list[0].isOnline ?Text("Online",style: TextStyle(color: Colors.green,fontSize: 13),):Text(myDateUtil.getLastActiveTime(context: context, lastActive: list[0].lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),):Text(myDateUtil.getLastActiveTime(context: context, lastActive: widget.user.lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),)
 
               ],
             )
@@ -292,10 +285,17 @@ class _ChatScreen extends State<ChatScreen>{
           ),
           //sending button
           MaterialButton(onPressed: (){
-            if(_textController.text.isNotEmpty){
-              APIs.sendMessage(widget.user, _textController.text,Type.text);
-             // log("date: ${_list}");
-              _textController.text="";
+            if (_textController.text.isNotEmpty) {
+              if (_list.isEmpty) {
+                //on first message (add user to my_user collection of chat user)
+                APIs.sendFirstMessage(
+                    widget.user, _textController.text, Type.text);
+              } else {
+                //simply send message
+                APIs.sendMessage(
+                    widget.user, _textController.text, Type.text);
+              }
+              _textController.text = '';
             }
           },
             minWidth: 0,

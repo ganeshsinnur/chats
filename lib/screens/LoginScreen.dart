@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen>{
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Welcome Intelli Chat"),
+          title: const Text("Welcome Intelli Chat"),
         ),
 
         body: Stack(children: [
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen>{
                 _handleGooglebtnClick();
               },
                   icon: Image.asset('assets/images/google.png', height: mq.height * .03),
-                  label: Text('Sign in with Google')
+                  label: const Text('Sign in with Google')
               )
           ),
           Positioned(

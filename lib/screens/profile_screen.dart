@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intellichat/helper/dailogs.dart';
@@ -385,33 +386,39 @@ class _ProfileScreen extends State<ProfileScreen> {
                   //   title: 'Mail',
                   //   detail: widget.user.email,
                   // ),
-                  Row(
-                    children: [
-                      const Icon(Icons.mail, color: Color(0xFF64B4EF)),
-                      //Color of icon
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Mail id',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 14,
+                  InkWell(
+                    onLongPress: ()async {
+                      await Clipboard.setData(ClipboardData(text: widget.user.email)).then((value) {Dailogs.showSnackbar(context, 'Mail id copied');
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        const Icon(Icons.mail, color: Color(0xFF64B4EF)),
+                        //Color of icon
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Mail id',
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.user.email,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.user.email,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                    ],
+                          ],
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
                   )
                 ],
               ),

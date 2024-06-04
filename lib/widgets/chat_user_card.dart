@@ -63,7 +63,7 @@ class _ChatUserCardState extends State<Chatusercard>{
                 subtitle: _message == null
                     ?Text( widget.user.about,style:TextStyle(color: Colors.white38),maxLines: 1)
                     :_message!.type == Type.image
-                    ? Row(children: [Icon(Icons.image,size: 15,),Text("Image",style:  TextStyle(color: Colors.white38))],)
+                    ? const Row(children: [Icon(Icons.image,size: 15,),Text("Image",style:  TextStyle(color: Colors.white38))],)
                     :Text(_message!.msg,style:  const TextStyle(color: Colors.white38),maxLines: 1,),
                 //Text( _message == null ? widget.user.about :_message!.type == Type.image ? 'image' : _message!.msg , maxLines: 1 ,style:  TextStyle(color: Colors.white38), ),
                 //trailing: const Text("12:00 AM",style: TextStyle(color: Colors.white38),),
