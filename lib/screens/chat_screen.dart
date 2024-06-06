@@ -53,11 +53,12 @@ class _ChatScreen extends State<ChatScreen>{
           },
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color(0xFF252D3A),
+              backgroundColor: const Color(0xFF1C1C1C),
               toolbarHeight: 65,
               automaticallyImplyLeading: false,
               flexibleSpace:_appBar() ,
             ),
+            backgroundColor: const Color(0xFF121212),
             body:Column(
               children: [
                 Expanded(
@@ -69,7 +70,7 @@ class _ChatScreen extends State<ChatScreen>{
                         //if data is loading
                           case ConnectionState.waiting:
                           case ConnectionState.none:
-                            return SizedBox();
+                            return const SizedBox();
 
                         //if some or all data is loaded then show it
                           case ConnectionState.active:
@@ -215,7 +216,7 @@ class _ChatScreen extends State<ChatScreen>{
               children: [
                 Text(list.isNotEmpty ? list[0].name : widget.user.name,style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18),),
                // Text(list.isNotEmpty ? list[0].isOnline ? 'Online' : myDateUtil.getLastActiveTime(context: context, lastActive: list[0].lastActive)// : myDateUtil.getLastActiveTime(context: context, lastActive: widget.user.lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),)
-                list.isNotEmpty ? list[0].isOnline ?Text("Online",style: TextStyle(color: Colors.green,fontSize: 13),):Text(myDateUtil.getLastActiveTime(context: context, lastActive: list[0].lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),):Text(myDateUtil.getLastActiveTime(context: context, lastActive: widget.user.lastActive),style: TextStyle(color: Colors.white70,fontSize: 10),)
+                list.isNotEmpty ? list[0].isOnline ?const Text("Online",style: TextStyle(color: Colors.green,fontSize: 13),):Text(myDateUtil.getLastActiveTime(context: context, lastActive: list[0].lastActive),style: const TextStyle(color: Colors.white70,fontSize: 10),):Text(myDateUtil.getLastActiveTime(context: context, lastActive: widget.user.lastActive),style: const TextStyle(color: Colors.white70,fontSize: 10),)
 
               ],
             )
@@ -299,7 +300,7 @@ class _ChatScreen extends State<ChatScreen>{
             }
           },
             minWidth: 0,
-            padding: EdgeInsets.only(top: 10,bottom: 10,left: 10,right: 5),
+            padding: const EdgeInsets.only(top: 10,bottom: 10,left: 10,right: 5),
             shape: const CircleBorder(),
             color: const Color(0xFF64B4EF),
             child: const Icon(Icons.send,color: Colors.black,),)

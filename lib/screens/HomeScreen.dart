@@ -1,11 +1,9 @@
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:flutter/cupertino.dart';
 import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intellichat/screens/profile_screen.dart';
 import 'package:intellichat/widgets/chat_user_card.dart';
 
@@ -56,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //bool isDark = Provider.of<ThemeNotifier>(context).isDarkTheme;
     //SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     var mq = MediaQuery.of(context).size;
     return GestureDetector(
@@ -76,8 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: Scaffold(
+          backgroundColor: const Color(0xFF121212),
           appBar: AppBar(
-            backgroundColor: Color(0xFF252D3A),
+            //shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(4)),
+            backgroundColor:const Color(0xFF1C1C1C)
+                ,
             toolbarHeight: 65,
             leading: Container(
                 margin: const EdgeInsets.only(left: 10, top: 5),
@@ -86,39 +88,34 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         Scaffold.of(context).openDrawer();
                       },
-                      icon: Image.asset(
-                        "assets/icons/menu.png",
-                        width: 25,
-                        height: 25,
-                        color: Colors.white,
-                      )),
+                      icon: const Icon(Icons.menu_rounded,size: 29,color: Colors.white,)),
                 )),
             title: _issearching
                 ? TextField(
-                    style: const TextStyle(
-                        fontSize: 17, letterSpacing: 0.5, color: Colors.white),
-                    onChanged: (val) {
-                      //searching logic
-                      _searchList.clear();
-                      for (var i in _list) {
-                        if (i.name.toLowerCase().contains(val.toLowerCase()) ||
-                            i.name.toLowerCase().contains(val.toLowerCase())) {
-                          _searchList.add(i);
-                        }
-                        setState(() {
-                          _searchList;
-                        });
-                      }
-                    },
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                        hintStyle: TextStyle(color: Colors.white38),
-                        border: InputBorder.none,
-                        hintText: "Name, Phone, Email"),
-                  )
+              style: const TextStyle(
+                  fontSize: 17, letterSpacing: 0.5, color: Colors.white),
+              onChanged: (val) {
+                //searching logic
+                _searchList.clear();
+                for (var i in _list) {
+                  if (i.name.toLowerCase().contains(val.toLowerCase()) ||
+                      i.name.toLowerCase().contains(val.toLowerCase())) {
+                    _searchList.add(i);
+                  }
+                  setState(() {
+                    _searchList;
+                  });
+                }
+              },
+              autofocus: true,
+              decoration:  const InputDecoration(
+                  hintStyle: TextStyle(color: Colors.white38),
+                  border: InputBorder.none,
+                  hintText: "Name, Phone, Email"),
+            )
                 : const Text("Intelli Chat",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
             actions: [
               IconButton(
                   onPressed: () {
@@ -126,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     setState(() {});
                   },
                   icon:
-                      Icon(_issearching ? Icons.clear : Icons.search_rounded)),
+                  Icon(_issearching ? Icons.clear : Icons.search_rounded,color: Colors.white,)),
             ],
           ),
           floatingActionButton: Padding(
@@ -135,19 +132,18 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 _addChatUserDialog();
               },
-              backgroundColor: const Color(0xFF64B4EF),
-              child: const Icon(Icons.create),
+              backgroundColor: const Color(0xFFE0E0E0),
+              child: const Icon(Icons.create, color: Color(0xFF1C1C1C)),
             ),
           ),
-          backgroundColor: const Color(0xFF1D2733),
           drawer: Drawer(
-            backgroundColor: Colors.grey[900], // Change drawer color
+            backgroundColor: const Color(0xFF1C1C1C), // Change drawer color
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
                 UserAccountsDrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Colors.blueGrey[900],
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF1C1C1C),
                   ),
                   accountName: const Text(
                     "hlo",// APIs.me.name,
@@ -167,8 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   currentAccountPicture: ClipRRect(
                     borderRadius: BorderRadius.circular(70),
                     child: CachedNetworkImage(
-                     // width: mq.height * .2,
-                      //height: mq.height * .2,
                       fit: BoxFit.cover,
                       imageUrl: "APIs.me.image",
                       errorWidget: (context, url, error) =>
@@ -178,25 +172,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   otherAccountsPictures: [
-                    IconButton(
-                      icon:
-                          Icon(Icons.sunny, color: Colors.white),
-                      onPressed: () {},
-                    ),
+                    // IconButton(
+                    //   icon: Icon(isDark?Icons.sunny:Icons.dark_mode, /*color: Colors.white*/),
+                    //   onPressed: () {
+                    //     Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
+                    //    // setState((){});
+                    //   },
+                    // ),
                   ],
                 ),
                 ListTile(
-                  leading: Icon(Icons.message, color: Colors.white),
-                  title:
-                      const Text('Messages', style: TextStyle(color: Colors.white)),
+                  leading: const Icon(Icons.message, color: Colors.grey),
+                  title: const Text('Messages', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     // Handle the tap
                     Navigator.pop(context);
                   },
                 ),
                 ListTile(
-                  leading:
-                      const Icon(Icons.account_circle_outlined, color: Colors.white),
+                  leading: const Icon(Icons.account_circle_outlined, color: Colors.grey),
                   title: const Text('Profile', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     Navigator.pop(context);
@@ -223,16 +217,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.settings, color: Colors.white),
-                  title:
-                      const Text('Settings', style: TextStyle(color: Colors.white)),
+                  leading: const Icon(Icons.settings, color: Colors.grey),
+                  title: const Text('Settings', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     // Handle the tap
                     Navigator.pop(context);
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.person_add, color: Colors.white),
+                  leading: const Icon(Icons.person_add, color: Colors.grey),
                   title: const Text('Invite', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     // Handle the tap
@@ -240,11 +233,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 const Divider(
-                  color: Colors.grey,
+                 // color: Colors.grey,
                 ),
                 ListTile(
-                  leading:
-                      const Icon(Icons.info_outline_rounded, color: Colors.white),
+                  leading: const Icon(Icons.info_outline_rounded, color: Colors.grey),
                   title: const Text('About', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     // Handle the tap
@@ -254,105 +246,67 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-           body: StreamBuilder(
-             stream: APIs.getMyUsersId(),
+          body: StreamBuilder(
+            stream: APIs.getMyUsersId(),
 
-             //get id of only known users
-             builder: (context, snapshot) {
-               switch (snapshot.connectionState) {
-               //if data is loading
-                 case ConnectionState.waiting:
-                 case ConnectionState.none:
-                   return const Center(child: CircularProgressIndicator());
+            //get id of only known users
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+              //if data is loading
+                case ConnectionState.waiting:
+                case ConnectionState.none:
+                  return const Center(child: CircularProgressIndicator());
 
-               //if some or all data is loaded then show it
-                 case ConnectionState.active:
-                 case ConnectionState.done:
-                   return StreamBuilder(
-                     stream: APIs.getAllUsers(
-                         snapshot.data?.docs.map((e) => e.id).toList() ?? []),
+              //if some or all data is loaded then show it
+                case ConnectionState.active:
+                case ConnectionState.done:
+                  return StreamBuilder(
+                    stream: APIs.getAllUsers(
+                        snapshot.data?.docs.map((e) => e.id).toList() ?? []),
 
-                     //get only those user, who's ids are provided
-                     builder: (context, snapshot) {
-                       switch (snapshot.connectionState) {
-                       //if data is loading
-                         case ConnectionState.waiting:
-                         case ConnectionState.none:
-                         // return const Center(
-                         //     child: CircularProgressIndicator());
+                    //get only those user, who's ids are provided
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                      //if data is loading
+                        case ConnectionState.waiting:
+                        case ConnectionState.none:
+                        // return const Center(
+                        //     child: CircularProgressIndicator());
 
-                         //if some or all data is loaded then show it
-                         case ConnectionState.active:
-                         case ConnectionState.done:
-                           final data = snapshot.data?.docs;
-                           _list = data
-                               ?.map((e) => ChatUser.fromJson(e.data()))
-                               .toList() ??
-                               [];
+                        //if some or all data is loaded then show it
+                        case ConnectionState.active:
+                        case ConnectionState.done:
+                          final data = snapshot.data?.docs;
+                          _list = data
+                              ?.map((e) => ChatUser.fromJson(e.data()))
+                              .toList() ??
+                              [];
 
-                           if (_list.isNotEmpty) {
-                             return ListView.builder(
-                                 itemCount: _issearching
-                                     ? _searchList.length
-                                     : _list.length,
-                                 padding: EdgeInsets.only(top: mq.height * .01),
-                                 physics: const BouncingScrollPhysics(),
-                                 itemBuilder: (context, index) {
-                                   return Chatusercard(
-                                       user: _issearching
-                                           ? _searchList[index]
-                                           : _list[index]);
-                                 });
-                           } else {
-                             return const Center(
-                               child: Text('No Connections Found!',
-                                   style: TextStyle(fontSize: 20)),
-                             );
-                           }
-                       }
-                     },
-                   );
-               }
-             },
-           ),
-          //StreamBuilder(
-          //     stream: APIs.getAllUsers(),
-          //     builder: (context, snapshot) {
-          //       switch (snapshot.connectionState) {
-          //         //if data is loading
-          //         case ConnectionState.waiting:
-          //         case ConnectionState.none:
-          //           return const Center(child: CircularProgressIndicator());
-          //
-          //         //if some or all data is loaded then show it
-          //         case ConnectionState.active:
-          //         case ConnectionState.done:
-          //           final data = snapshot.data?.docs;
-          //           _list = data
-          //                   ?.map((e) => ChatUser.fromJson(e.data()))
-          //                   .toList() ??
-          //               [];
-          //           if (_list.isNotEmpty) {
-          //             return ListView.builder(
-          //                 padding: EdgeInsets.only(top: mq.height * 0.01),
-          //                 itemCount:
-          //                     _issearching ? _searchList.length : _list.length,
-          //                 physics: const BouncingScrollPhysics(),
-          //                 itemBuilder: (context, index) {
-          //                   return Chatusercard(
-          //                       user: _issearching
-          //                           ? _searchList[index]
-          //                           : _list[index]);
-          //                   //return Text("Name: ${list[index]}",style: TextStyle(color: Colors.white),);
-          //                 });
-          //           } else {
-          //             return const Text("Add users from the below button",
-          //                 style: TextStyle(
-          //                     fontWeight: FontWeight.w500,
-          //                     color: Colors.white));
-          //           }
-          //       }
-          //     }),
+                          if (_list.isNotEmpty) {
+                            return ListView.builder(
+                                itemCount: _issearching
+                                    ? _searchList.length
+                                    : _list.length,
+                                padding: EdgeInsets.only(top: mq.height * .01),
+                                physics: const BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return Chatusercard(
+                                      user: _issearching
+                                          ? _searchList[index]
+                                          : _list[index]);
+                                });
+                          } else {
+                            return const Center(
+                              child: Text('No Connections Found!',
+                                  style: TextStyle(fontSize: 20, color: Color(0xFFE0E0E0))),
+                            );
+                          }
+                      }
+                    },
+                  );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -364,67 +318,71 @@ class _HomeScreenState extends State<HomeScreen> {
     String email = '';
 
     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          contentPadding: const EdgeInsets.only(
-              left: 24, right: 24, top: 20, bottom: 10),
-
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),
-
-          //title
-          title: const Row(
-            children: [
-              Icon(
-                Icons.person_add,
-                color: Colors.blue,
-                size: 28,
-              ),
-              Text('  Add User')
-            ],
-          ),
-
-          //content
-          content: TextFormField(
-            maxLines: null,
-            onChanged: (value) => email = value,
-            decoration: InputDecoration(
-                hintText: 'Email Id',
-                prefixIcon: const Icon(Icons.email, color: Colors.blue),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15))),
-          ),
-
-          //actions
-          actions: [
-            //cancel button
-            MaterialButton(
-                onPressed: () {
-                  //hide alert dialog
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel',
-                    style: TextStyle(color: Colors.blue, fontSize: 16))),
-
-            //add button
-            MaterialButton(
-                onPressed: () async {
-                  //hide alert dialog
-                  Navigator.pop(context);
-                  if (email.isNotEmpty) {
-                    await APIs.addChatUser(email).then((value) {
-                      if (!value) {
-                        Dailogs.showSnackbar(
-                            context, 'User does not Exists!');
-                      }
-                    });
-                  }
-                },
-                child: const Text(
-                  'Add',
-                  style: TextStyle(color: Colors.blue, fontSize: 16),
-                ))
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1C), // Background color of the dialog
+        contentPadding: const EdgeInsets.only(
+            left: 24, right: 24, top: 20, bottom: 10),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
+        // Title
+        title: const Row(
+          children: [
+            Icon(
+              Icons.person_add,
+              color: Color(0xFFE0E0E0),
+              size: 28,
+            ),
+            Text('  Add User', style: TextStyle(color: Color(0xFFE0E0E0)))
           ],
-        ));
+        ),
+        // Content
+        content: TextFormField(
+          style: const TextStyle(color: Colors.white), // Updated text color for dark mode
+          maxLines: null,
+          onChanged: (value) => email = value,
+          decoration: InputDecoration(
+            hintText: 'Email Id',
+            hintStyle: const TextStyle(color: Colors.white54), // Updated hint text color for dark mode
+            prefixIcon: const Icon(Icons.email, color: Color(0xFFE0E0E0)), // Updated icon color for dark mode
+            filled: true,
+            fillColor: const Color(0xFF1C1C1C),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(color: Colors.white54)), // Updated border color for dark mode
+          ),
+        ),
+        // Actions
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel',
+                style: TextStyle(/*color: Colors.blue,*/ fontSize: 16)),
+          ),
+          // Add button
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              if (email.isNotEmpty) {
+                await APIs.addChatUser(email).then((value) {
+                  if (!value) {
+                    Dailogs.showSnackbar(
+                        context, 'User does not Exist!');
+                  }
+                });
+              }
+            },
+            child: const Text(
+              'Add',
+              style: TextStyle(/*color: Colors.blue,*/ fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
   }
+
 }

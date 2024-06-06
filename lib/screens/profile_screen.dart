@@ -10,10 +10,11 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intellichat/helper/dailogs.dart';
-import 'package:intellichat/screens/HomeScreen.dart';
 import 'package:intellichat/screens/LoginScreen.dart';
+import 'package:provider/provider.dart';
 import '../api/apis.dart';
 import '../models/chat_user.dart';
+import '../theme/theme_notifier.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ChatUser user;
@@ -29,48 +30,100 @@ class _ProfileScreen extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //bool isDark = Provider.of<ThemeNotifier>(context).isDarkTheme;
     final mq = MediaQuery.of(context).size;
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     return Scaffold(
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF252D3A),
+        backgroundColor: const Color(0xFF1C1C1C),
         toolbarHeight: 65,
         leading: IconButton(
           onPressed: () {
-            //Navigator.pop(context);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+            Navigator.pop(context);
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(builder: (_) => const HomeScreen())
+            // ,);
           },
-          icon: const Icon(Icons.arrow_back_rounded),
-          color: Colors.white,
-        ),
+          icon: const Icon(Icons.arrow_back_rounded,color: Colors.white,)),
         title: const Text("Profile",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        actions: [IconButton(onPressed: (){}, icon: Icon(CupertinoIcons.ellipsis_vertical),color: Colors.white,)],
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
+            },
+            icon: Icon(CupertinoIcons.ellipsis_vertical),
+            color: Colors.white,
+          ),
+          //PopupMenuButton(itemBuilder: (context)=> [PopupMenuItem(child: Text("hello"))]),
+        ],
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: FloatingActionButton.extended(
-          onPressed: () async {
-            await APIs.updateActiveStatus(false);
-            Dailogs.showProgressbar(context);
-            await APIs.auth.signOut().then((value) async {
-              await GoogleSignIn().signOut().then((value) {
-                Navigator.pop(context);
-                Navigator.pop(context);
-                // Navigator.pop(context);
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(color: Color(0xFFFEF7FF)),
+                  ),
+                  content: Text(
+                    'Are you sure you want to logout?',
+                    style: TextStyle(color: Color(0xFFFEF7FF)),
+                  ),
+                  backgroundColor: Color(0xFF121212),
+                  elevation: 6,
+                  actions: [
+                    TextButton(
+                      child: Text(
+                        'Cancel',
+                        style:
+                            TextStyle(color: Color(0xFFFEF7FF), fontSize: 18),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(color: Colors.red, fontSize: 18),
+                      ),
+                      onPressed: () async {
+                        await APIs.updateActiveStatus(false);
+                        Dailogs.showProgressbar(context);
+                        await APIs.auth.signOut().then((value) async {
+                          await GoogleSignIn().signOut().then((value) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            // Navigator.pop(context);
 
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (_) => LoginScreen()));
-              });
-            });
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => LoginScreen()));
+                          });
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
           },
           backgroundColor: const Color(0xFF64B4EF),
           icon: const Icon(Icons.logout),
           label: Text("Logout"),
         ),
       ),
-      backgroundColor: const Color(0xFF1D2733),
+      //backgroundColor: const Color(0xFF121212),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -80,7 +133,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                 children: [
                   //Profile Photo
                   _image != null
-                  //local image
+                      //local image
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(mq.height * .1),
                           child: Image.file(
@@ -90,7 +143,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                             fit: BoxFit.cover,
                           ),
                         )
-                  //image from server
+                      //image from server
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(70),
                           child: CachedNetworkImage(
@@ -104,18 +157,12 @@ class _ProfileScreen extends State<ProfileScreen> {
                             ),
                           ),
                         ),
-                  // CircleAvatar(
-                  //   radius: 70, //if possible use : CachedNetworkImage(}
-                  //   backgroundImage: NetworkImage(
-                  //     widget.user.image,
-                  //   ),
-                  // ),
                   Positioned(
                     bottom: 0,
                     right: 0,
                     child: CircleAvatar(
                       radius: 20,
-                      backgroundColor: Color(0xFF64B4EF),
+                      backgroundColor: Color(0xFF343131),
                       child: IconButton(
                         onPressed: () {
                           _showBottomSheet();
@@ -139,7 +186,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.person, color: Color(0xFF64B4EF)),
+                      const Icon(Icons.person, color: Color(0xFFB0BEC5)),
                       //Color of icon
                       const SizedBox(width: 16),
                       Column(
@@ -155,7 +202,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                           const SizedBox(height: 4),
                           Text(
                             widget.user.name,
-                            style: const TextStyle(
+                            style:
+                            const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                             ),
@@ -237,8 +285,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                                                             elevation: 0),
                                                     child: const Text("Save",
                                                         style: TextStyle(
-                                                            color: Color(
-                                                                0xff64b4ef))))
+                                                            // color: Color(0xff64b4ef)
+                                                            )))
                                               ],
                                             )
                                           ],
@@ -247,9 +295,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                                 );
                               });
                         },
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Color(0xFF64B4EF),
+                        icon:  const Icon(
+                          Icons.edit, color: Colors.white,
                         ),
                       ) // Name edit button
                     ],
@@ -263,19 +310,19 @@ class _ProfileScreen extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Row(
                     children: [
-                      const Icon(Icons.info, color: Color(0xFF64B4EF)),
+                       Icon(Icons.info, color:const Color(0xFFB0BEC5)),
                       //Color of icon
                       const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'About',
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color: Color(0xFFB0BEC5),
+                              //color: isDark?Colors.grey[500]:Colors.white38,
                               fontSize: 14,
                             ),
                           ),
@@ -375,25 +422,23 @@ class _ProfileScreen extends State<ProfileScreen> {
                         },
                         icon: const Icon(
                           Icons.edit,
-                          color: Color(0xFF64B4EF),
+                          color: Colors.white,
                         ),
                       ) //about edit button
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // ProfileDetail(
-                  //   icon: Icons.mail,
-                  //   title: 'Mail',
-                  //   detail: widget.user.email,
-                  // ),
                   InkWell(
-                    onLongPress: ()async {
-                      await Clipboard.setData(ClipboardData(text: widget.user.email)).then((value) {Dailogs.showSnackbar(context, 'Mail id copied');
+                    onLongPress: () async {
+                      await Clipboard.setData(
+                              ClipboardData(text: widget.user.email))
+                          .then((value) {
+                        Dailogs.showSnackbar(context, 'Mail id copied');
                       });
                     },
                     child: Row(
                       children: [
-                        const Icon(Icons.mail, color: Color(0xFF64B4EF)),
+                        const Icon(Icons.mail, color: Color(0xFFB0BEC5)),
                         //Color of icon
                         const SizedBox(width: 16),
                         Column(
@@ -431,7 +476,7 @@ class _ProfileScreen extends State<ProfileScreen> {
 
   //bottom sheet to popup for updating profile
   void _showBottomSheet() {
-   // var mq = MediaQuery.of(context).size;
+    // var mq = MediaQuery.of(context).size;
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1D2733),
@@ -457,10 +502,12 @@ class _ProfileScreen extends State<ProfileScreen> {
                 title: Text('Camera', style: TextStyle(color: Colors.white)),
                 onTap: () async {
                   final ImagePicker picker = ImagePicker();
-                  final XFile? image =
-                  await picker.pickImage(source: ImageSource.camera,imageQuality: 80);
+                  final XFile? image = await picker.pickImage(
+                      source: ImageSource.camera, imageQuality: 80);
                   if (image != null) {
-                    setState(() {_image=image.path;});
+                    setState(() {
+                      _image = image.path;
+                    });
                     log('Image Path: ${image.path}--Mimetype: ${image.mimeType}');
                     APIs.updateProfilePicture(File(_image!));
                     Navigator.pop(context);
@@ -473,10 +520,12 @@ class _ProfileScreen extends State<ProfileScreen> {
                     style: TextStyle(color: Colors.white)),
                 onTap: () async {
                   final ImagePicker picker = ImagePicker();
-                  final XFile? image =
-                      await picker.pickImage(source: ImageSource.gallery,imageQuality: 80);
+                  final XFile? image = await picker.pickImage(
+                      source: ImageSource.gallery, imageQuality: 80);
                   if (image != null) {
-                    setState(() {_image=image.path;});
+                    setState(() {
+                      _image = image.path;
+                    });
                     log('Image Path: ${image.path}--Mimetype: ${image.mimeType}');
                     APIs.updateProfilePicture(File(_image!));
                     Navigator.pop(context);
