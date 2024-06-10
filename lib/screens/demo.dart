@@ -1,3 +1,4 @@
+//this is for demo page just paste the code u get]
 import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -26,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Message> _list = [];
   List<String> Replies = ['Hi there!', 'How are you?', 'Hello'];
   final _textController = TextEditingController();
-  bool _isUploading = false;
+  bool  _isUploading = false;
   final _smartReply = rely.SmartReply();
 
   @override
@@ -67,11 +68,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         final data = snapshot.data?.docs;
                         _list = data
                             ?.map((e) => Message.fromJson(e.data()))
-                            .toList() ?? [];
+                            .toList() ??
+                            [];
                         _list.sort((b, a) => a.sent.compareTo(b.sent));
 
                         if (_list.isNotEmpty) {
-
                           return ListView.builder(
                             reverse: true,
                             padding: EdgeInsets.only(
@@ -80,8 +81,10 @@ class _ChatScreenState extends State<ChatScreen> {
                             itemCount: _list.length,
                             physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
-                              addMsgtoReply(_list[index]); // Add messages to SmartReply
-                              getSuggestions();
+                              //Message message = _list[index];
+                              //bool isMe = APIs.user.uid == message.fromId;
+                              //addMsgtoReply(_list[index]);
+                              //rely.SmartReply().close();
                               return MessageCard(message: _list[index]);
                             },
                           );
@@ -104,7 +107,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 const Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+                    padding:
+                    EdgeInsets.symmetric(horizontal: 10, vertical: 18),
                     child: CupertinoActivityIndicator(
                       animating: true,
                       radius: 30,
@@ -113,25 +117,24 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
               StreamBuilder(
-                stream: APIs.getAllMesseages(widget.user),
-                builder: (context, snapshot) {
-                  //getSuggestions();
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                    child: (Replies.isNotEmpty)
-                        ? Row(
-                      children: [
+                  stream: APIs.getAllMesseages(widget.user),
+                  builder: (context, snapshot) {
+                    //addLastMessagesToReply(_list);
+                    getSuggestions();
+                    return Padding(
+                      padding:
+                      const EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: (Replies.isNotEmpty)
+                          ? Row(children: [
                         chip(Replies[0]),
                         const SizedBox(width: 5),
                         chip(Replies[1]),
                         const SizedBox(width: 5),
                         chip(Replies[2]),
-                      ],
-                    )
-                        : null,
-                  );
-                },
-              ),
+                      ])
+                          :null,
+                    );
+                  }),
               _chatInput(),
             ],
           ),
@@ -240,7 +243,7 @@ class _ChatScreenState extends State<ChatScreen> {
               elevation: 1,
               child: Row(
                 children: [
-                  SizedBox(width: mq.width * .05),
+                  SizedBox(width: mq.width*.05,),
                   Expanded(
                     child: TextField(
                       onTap: () {},
@@ -288,7 +291,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         });
                       }
                     },
-                    icon: const Icon(Icons.camera_alt, color: Color(0xFF64B4EF)),
+                    icon:
+                    const Icon(Icons.camera_alt, color: Color(0xFF64B4EF)),
                   ),
                 ],
               ),
@@ -300,7 +304,7 @@ class _ChatScreenState extends State<ChatScreen> {
               if (_textController.text.isNotEmpty) {
                 APIs.sendMessage(widget.user, _textController.text, Type.text);
                 _textController.clear();
-                //getSuggestions();
+                getSuggestions();
               }
             },
             minWidth: 0,
@@ -327,7 +331,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Future<void> getSuggestions() async {
+  void getSuggestions() async {
     // Fetch suggestions using Google ML Kit and rebuild page
     List oldSuggestions = Replies;
     final response = await _smartReply.suggestReplies();
@@ -354,4 +358,52 @@ class _ChatScreenState extends State<ChatScreen> {
           message.msg, int.parse(message.sent), message.fromId);
     }
   }
+
+  List<Message> getLastMessages(List<Message> messages, int count) {
+    if (messages.length <= count) {
+      return messages;
+    }
+    return messages.sublist(0, count);
+  }
+
+  void addLastMessagesToReply(List<Message> messages) {
+    final lastMessages =
+    getLastMessages(messages, 6);
+
+    for (var message in lastMessages) {
+      bool isMe = APIs.user.uid == message.fromId;
+      if (isMe) {
+        rely.SmartReply().addMessageToConversationFromLocalUser(
+            message.msg, int.parse(message.sent));
+        log("isMe--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
+      } else {
+        rely.SmartReply().addMessageToConversationFromRemoteUser(
+            message.msg, int.parse(message.sent), message.fromId);
+        log("remote user--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
+      }
+    }
+  }
+
+// void addLastMessagesToReply(List<Message> messages) {
+//   final lastMessages = getLastMessages(messages, 6);
+//   for (var message in lastMessages) {
+//     bool isMe = APIs.user.uid == message.fromId;
+//     if (isMe) {
+//       _smartReply.addMessageToConversationFromLocalUser(
+//           message.msg, int.parse(message.sent));
+//       log("isMe--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
+//     } else {
+//       _smartReply.addMessageToConversationFromRemoteUser(
+//           message.msg, int.parse(message.sent), message.fromId);
+//       log("remote user--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
+//     }
+//   }
+// }
+//
+// List<Message> getLastMessages(List<Message> messages, int count) {
+//   if (messages.length <= count) {
+//     return messages;
+//   }
+//   return messages.sublist(0, count);
+// }
 }

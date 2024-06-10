@@ -54,8 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //bool isDark = Provider.of<ThemeNotifier>(context).isDarkTheme;
-    //SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     var mq = MediaQuery.of(context).size;
     return GestureDetector(
       // for hiding keyboard
@@ -75,11 +73,13 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: const Color(0xFF121212),
+          backgroundColor: const Color(0xFF202020),
+          //backgroundColor: const Color(0xFF1D2733),
+          // backgroundColor: const Color(0xFF121212),
           appBar: AppBar(
+              backgroundColor: const Color(0xFF252D3A),
             //shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(4)),
-            backgroundColor:const Color(0xFF1C1C1C)
-                ,
+            //backgroundColor:const Color(0xFF1C1C1C),
             toolbarHeight: 65,
             leading: Container(
                 margin: const EdgeInsets.only(left: 10, top: 5),
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: _issearching
                 ? TextField(
               style: const TextStyle(
-                  fontSize: 17, letterSpacing: 0.5, color: Colors.white),
+                  fontSize: 17, letterSpacing: 0.5, color: Colors.white,),
               onChanged: (val) {
                 //searching logic
                 _searchList.clear();
@@ -113,9 +113,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   border: InputBorder.none,
                   hintText: "Name, Phone, Email"),
             )
-                : const Text("Intelli Chat",
+                : const Text("I N T E L L I  C H A T",
                 style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                    fontFamily: 'Sedan'
+                )),
             actions: [
               IconButton(
                   onPressed: () {
@@ -132,29 +136,29 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 _addChatUserDialog();
               },
-              backgroundColor: const Color(0xFFE0E0E0),
-              child: const Icon(Icons.create, color: Color(0xFF1C1C1C)),
+              backgroundColor: const Color(0xFF64B4EF),///0xFFE0E0E0
+              child: const Icon(Icons.create, /*color: Color(0xFF1C1C1C)*/),
             ),
           ),
           drawer: Drawer(
-            backgroundColor: const Color(0xFF1C1C1C), // Change drawer color
+            backgroundColor: Colors.grey[900],//const Color(0xFF1C1C1C), // Change drawer color
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
                 UserAccountsDrawerHeader(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF1C1C1C),
+                  decoration:  BoxDecoration(
+                    color: Colors.blueGrey[900],// Color(0xFF1C1C1C),
                   ),
-                  accountName: const Text(
-                    "hlo",// APIs.me.name,
+                  accountName:  const Text(
+                    " APIs.me.name",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  accountEmail: const Text(
-                    "APIs.me.email",
+                  accountEmail:  const Text(
+                   " APIs.me.email",
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
@@ -171,27 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  otherAccountsPictures: [
-                    // IconButton(
-                    //   icon: Icon(isDark?Icons.sunny:Icons.dark_mode, /*color: Colors.white*/),
-                    //   onPressed: () {
-                    //     Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
-                    //    // setState((){});
-                    //   },
-                    // ),
-                  ],
                 ),
-                ListTile(
-                  leading: const Icon(Icons.message, color: Colors.grey),
-                  title: const Text('Messages', style: TextStyle(color: Colors.white)),
-                  onTap: () {
-                    // Handle the tap
-                    Navigator.pop(context);
-                  },
-                ),
+
                 ListTile(
                   leading: const Icon(Icons.account_circle_outlined, color: Colors.grey),
-                  title: const Text('Profile', style: TextStyle(color: Colors.white)),
+                  title: const Text('Profile ', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -217,32 +205,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.settings, color: Colors.grey),
-                  title: const Text('Settings', style: TextStyle(color: Colors.white)),
-                  onTap: () {
-                    // Handle the tap
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
                   leading: const Icon(Icons.person_add, color: Colors.grey),
-                  title: const Text('Invite', style: TextStyle(color: Colors.white)),
+                  title: const Text('Invite (no func yet)', style: TextStyle(color: Colors.white38)),
                   onTap: () {
                     // Handle the tap
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
                   },
                 ),
-                const Divider(
-                 // color: Colors.grey,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline_rounded, color: Colors.grey),
-                  title: const Text('About', style: TextStyle(color: Colors.white)),
-                  onTap: () {
-                    // Handle the tap
-                    Navigator.pop(context);
-                  },
-                ),
+
               ],
             ),
           ),
@@ -322,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1C), // Background color of the dialog
         contentPadding: const EdgeInsets.only(
-            left: 24, right: 24, top: 20, bottom: 10),
+            left: 18, right: 18, top: 25, bottom: 25),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20)),
         // Title
@@ -331,9 +301,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(
               Icons.person_add,
               color: Color(0xFFE0E0E0),
-              size: 28,
+              size: 25,
             ),
-            Text('  Add User', style: TextStyle(color: Color(0xFFE0E0E0)))
+            Text('  Add User', style: TextStyle(fontFamily: 'Sedan', color: Color(0xFFE0E0E0)))
           ],
         ),
         // Content
@@ -360,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pop(context);
             },
             child: const Text('Cancel',
-                style: TextStyle(/*color: Colors.blue,*/ fontSize: 16)),
+                style: TextStyle(color: Colors.blue, fontSize: 16)),
           ),
           // Add button
           TextButton(
@@ -377,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: const Text(
               'Add',
-              style: TextStyle(/*color: Colors.blue,*/ fontSize: 16),
+              style: TextStyle(color: Colors.blue, fontSize: 16),
             ),
           ),
         ],

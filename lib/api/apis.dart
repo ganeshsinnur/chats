@@ -291,4 +291,14 @@ class APIs {
         .collection('my_users')
         .snapshots();
   }
+
+
+  ///Things for smart Reply generation
+  static Future<List<String>> fetchSmartReplies(List<String> messages) async {
+    // Here, you would call your smart reply API
+    // This is a dummy implementation
+    await Future.delayed(Duration(seconds: 1)); // Simulating network delay
+    return ["Sure!", "No, thanks.", "I'll think about it."];
+  }
+
 }

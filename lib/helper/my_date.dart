@@ -8,6 +8,12 @@ class myDateUtil{
     return TimeOfDay.fromDateTime(date).format(context);
   }
 
+  static DateTime getTime(
+      {required BuildContext context,required String time}){
+    final date = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+    return date;
+  }
+
   // for getting formatted time for sent & read
   static String getMessageTime(
       {required BuildContext context, required String time}) {
@@ -25,6 +31,14 @@ class myDateUtil{
         ? '$formattedTime - ${sent.day} ${_getMonth(sent)}'
         : '$formattedTime - ${sent.day} ${_getMonth(sent)} ${sent.year}';
   }
+
+  static String getTimeDate(
+      {required BuildContext context, required String time}) {
+    final DateTime sent = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+    final formattedTime = TimeOfDay.fromDateTime(sent).format(context);
+        return  '$formattedTime - ${sent.day} ${_getMonth(sent)} ${sent.year}';
+  }
+
 
   static String getLastMessageTime(
       {required BuildContext context,required String time,bool showYear=false}){

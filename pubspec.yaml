@@ -66,9 +66,19 @@ dependencies:
   #for dynamic_themes:
   provider: ^6.0.0
 
+  #google ML-Kit
+  google_mlkit_smart_reply: ^0.11.0
+#  smart_reply: ^0.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/email.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -105,11 +115,11 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
+  fonts:
+     - family: Sedan
+       fonts:
+         - asset: assets/fonts/Sedan-Italic.ttf
+         - asset: assets/fonts/Sedan-Regular.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

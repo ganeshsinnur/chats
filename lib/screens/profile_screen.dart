@@ -1,8 +1,5 @@
-//import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +8,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intellichat/helper/dailogs.dart';
 import 'package:intellichat/screens/LoginScreen.dart';
-import 'package:provider/provider.dart';
 import '../api/apis.dart';
 import '../models/chat_user.dart';
-import '../theme/theme_notifier.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ChatUser user;
@@ -30,39 +25,88 @@ class _ProfileScreen extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //bool isDark = Provider.of<ThemeNotifier>(context).isDarkTheme;
     final mq = MediaQuery.of(context).size;
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1C1C1C),
+        backgroundColor: const Color(0xFF252D3A),
+        //Color(0xFF1C1C1C),
         toolbarHeight: 65,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (_) => const HomeScreen())
-            // ,);
-          },
-          icon: const Icon(Icons.arrow_back_rounded,color: Colors.white,)),
-        title: const Text("Profile",
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
             onPressed: () {
-              Provider.of<ThemeNotifier>(context, listen: false).toggleTheme();
+              Navigator.pop(context);
             },
-            icon: Icon(CupertinoIcons.ellipsis_vertical),
-            color: Colors.white,
-          ),
-          //PopupMenuButton(itemBuilder: (context)=> [PopupMenuItem(child: Text("hello"))]),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+            )),
+        title: const Text("Profile",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        actions: [
+          PopupMenuButton(
+              color: Color(0xFF121212),
+              iconColor: Colors.white,
+              itemBuilder: (_)=>[
+            PopupMenuItem(onTap:()
+            {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text(
+                      'Logout',
+                      style: TextStyle(color: Color(0xFFFEF7FF)),
+                    ),
+                    content: const Text(
+                      'Are you sure you want to logout?',
+                      style: TextStyle(color: Color(0xFFFEF7FF)),
+                    ),
+                    backgroundColor: const Color(0xFF121212),
+                    elevation: 6,
+                    actions: [
+                      TextButton(
+                        child: const Text(
+                          'Cancel',
+                          style:
+                          TextStyle(color: Color(0xFFFEF7FF), fontSize: 18),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.red, fontSize: 18),
+                        ),
+                        onPressed: () async {
+                          await APIs.updateActiveStatus(false);
+                          Dailogs.showProgressbar(context);
+                          await APIs.auth.signOut().then((value) async {
+                            await GoogleSignIn().signOut().then((value) {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              // Navigator.pop(context);
+
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const LoginScreen()));
+                            });
+                          });
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+                child: ListTile(leading: Icon(Icons.logout,color: Colors.white,),title: Text("Logout",style: TextStyle(color: Colors.white),),))
+          ]),
         ],
       ),
-      floatingActionButton: Padding(
+      /*floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: FloatingActionButton.extended(
           onPressed: () {
@@ -70,19 +114,19 @@ class _ProfileScreen extends State<ProfileScreen> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text(
+                  title: const Text(
                     'Logout',
                     style: TextStyle(color: Color(0xFFFEF7FF)),
                   ),
-                  content: Text(
+                  content: const Text(
                     'Are you sure you want to logout?',
                     style: TextStyle(color: Color(0xFFFEF7FF)),
                   ),
-                  backgroundColor: Color(0xFF121212),
+                  backgroundColor: const Color(0xFF121212),
                   elevation: 6,
                   actions: [
                     TextButton(
-                      child: Text(
+                      child: const Text(
                         'Cancel',
                         style:
                             TextStyle(color: Color(0xFFFEF7FF), fontSize: 18),
@@ -92,7 +136,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                       },
                     ),
                     TextButton(
-                      child: Text(
+                      child: const Text(
                         'Logout',
                         style: TextStyle(color: Colors.red, fontSize: 18),
                       ),
@@ -108,7 +152,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => LoginScreen()));
+                                    builder: (_) => const LoginScreen()));
                           });
                         });
                       },
@@ -120,14 +164,14 @@ class _ProfileScreen extends State<ProfileScreen> {
           },
           backgroundColor: const Color(0xFF64B4EF),
           icon: const Icon(Icons.logout),
-          label: Text("Logout"),
+          label: const Text("Logout"),
         ),
-      ),
+      ),*/
       //backgroundColor: const Color(0xFF121212),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: Stack(
                 children: [
@@ -153,7 +197,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                             imageUrl: widget.user.image,
                             errorWidget: (context, url, error) =>
                                 const CircleAvatar(
-                              child: Icon(Icons.person),
+                                 child: Icon(Icons.person),
                             ),
                           ),
                         ),
@@ -162,11 +206,10 @@ class _ProfileScreen extends State<ProfileScreen> {
                     right: 0,
                     child: CircleAvatar(
                       radius: 20,
-                      backgroundColor: Color(0xFF343131),
+                      backgroundColor: const Color(0xFF343131),
                       child: IconButton(
                         onPressed: () {
                           _showBottomSheet();
-                          print("icon btn pressed");
                         },
                         icon: const Icon(
                           Icons.camera_alt,
@@ -202,8 +245,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                           const SizedBox(height: 4),
                           Text(
                             widget.user.name,
-                            style:
-                            const TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                             ),
@@ -217,15 +259,16 @@ class _ProfileScreen extends State<ProfileScreen> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  backgroundColor: Color(0xFF252D3A),
+                                  backgroundColor: const Color(0xFF121212),//Color(0xFF252D3A),
                                   //title: Text("edit"),
-                                  content: Container(
+                                  content: SizedBox(
                                     height: mq.height * 0.15,
                                     child: Form(
                                         key: _formKey,
                                         child: Column(
                                           children: [
                                             TextFormField(
+                                              maxLength: 30,
                                                 style: const TextStyle(
                                                     color: Colors.white),
                                                 //controller: TextEditingController(),
@@ -234,7 +277,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                                                 initialValue: widget.user.name,
                                                 decoration:
                                                     const InputDecoration(
-                                                  hintText: "eg. Available",
+                                                  hintText: "eg. Gani",
+                                                      hintStyle: TextStyle(color: Colors.white38)
                                                 ),
                                                 validator: (value) {
                                                   if (value == null ||
@@ -246,7 +290,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                             Row(
                                               //mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
-                                                Spacer(),
+                                                const Spacer(),
                                                 ElevatedButton(
                                                   onPressed: () {
                                                     Navigator.pop(context);
@@ -271,7 +315,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                                         _formKey.currentState!
                                                             .save();
                                                         APIs.updateUserInfo();
-                                                        log('inside validater');
+                                                        // log('inside validator');
                                                         Navigator.pop(context);
                                                         Dailogs.showSnackbar(
                                                             context, "Saved!");
@@ -285,7 +329,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                                             elevation: 0),
                                                     child: const Text("Save",
                                                         style: TextStyle(
-                                                            // color: Color(0xff64b4ef)
+                                                             color: Color(0xff64b4ef)
                                                             )))
                                               ],
                                             )
@@ -295,8 +339,9 @@ class _ProfileScreen extends State<ProfileScreen> {
                                 );
                               });
                         },
-                        icon:  const Icon(
-                          Icons.edit, color: Colors.white,
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Colors.white,
                         ),
                       ) // Name edit button
                     ],
@@ -312,7 +357,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                       Icon(Icons.info, color:const Color(0xFFB0BEC5)),
+                      const Icon(Icons.info, color: Color(0xFFB0BEC5)),
                       //Color of icon
                       const SizedBox(width: 16),
                       Column(
@@ -344,7 +389,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                               builder: (context) {
                                 return AlertDialog(
                                   //title: Text("edit"),
-                                  backgroundColor: Color(0xFF252D3A),
+                                  backgroundColor: const Color(0xFF252D3A),
                                   content: Container(
                                     height: mq.height * 0.15,
                                     child: Form(
@@ -371,7 +416,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                                                 }),
                                             Row(
                                               children: [
-                                                Spacer(),
+                                                const Spacer(),
                                                 ElevatedButton(
                                                   onPressed: () {
                                                     Navigator.pop(context);
@@ -498,8 +543,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                     fontWeight: FontWeight.bold),
               ),
               ListTile(
-                leading: Icon(Icons.camera_alt, color: Colors.blue),
-                title: Text('Camera', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.camera_alt, color: Colors.blue),
+                title: const Text('Camera', style: TextStyle(color: Colors.white)),
                 onTap: () async {
                   final ImagePicker picker = ImagePicker();
                   final XFile? image = await picker.pickImage(
