@@ -14,6 +14,11 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+  @override
+  void initState(){
+
+  }
+
 
 class _LoginScreenState extends State<LoginScreen> {
   void _handleGooglebtnClick() {

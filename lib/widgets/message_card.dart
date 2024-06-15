@@ -5,11 +5,21 @@ import 'package:flutter/services.dart';
 import 'package:intellichat/api/apis.dart';
 import 'package:intellichat/helper/my_date.dart';
 import '../helper/dailogs.dart';
+import '../models/chat_user.dart';
 import '../models/message.dart';
 
 class MessageCard extends StatefulWidget {
-  const MessageCard({super.key, required this.message});
+  const MessageCard(
+      {super.key,
+      required this.message,
+      /*required this.replyMessage,required this.rMsg,*/ required this.user});
+
+  final ChatUser user;
   final Message message;
+
+  //final Message replyMessage;
+  //final String rMsg;
+  //final ValueChanged<Message> onSwipedMessage;
 
   @override
   State<StatefulWidget> createState() => _MessageCardState();
@@ -24,11 +34,17 @@ class _MessageCardState extends State<MessageCard> {
       onLongPress: () {
         _showBottomSheet(isMe);
       },
-      child: isMe
-          ? _buildMessage(
-          const Color(0xFF9E9E9E), Alignment.centerRight, Colors.blue, true)
-          : _buildMessage(
-          const Color(0xFF5A5A5A), Alignment.centerLeft, Colors.grey, false),
+      child: widget.message.rMsg == ""
+          ? isMe
+              ? _buildMessage(const Color(0xFF2F4F4F), Alignment.centerRight,
+                  Colors.blue, true)
+              : _buildMessage(const Color(0xFF696969), Alignment.centerLeft,
+                  Colors.grey, false)
+          : isMe
+              ? _buildReplyMessage(const Color(0xFF2F4F4F),
+                  Alignment.centerRight, Colors.blue, true, Color(0xFF3F6B6B))
+              : _buildReplyMessage(const Color(0xFF696969),
+                  Alignment.centerLeft, Colors.grey, false, Color(0xFF808080)),
     );
   }
 
@@ -53,10 +69,11 @@ class _MessageCardState extends State<MessageCard> {
             color: bgColor,
             borderRadius: BorderRadius.only(
               topLeft:
-              !me ? const Radius.circular(0) : const Radius.circular(20),
-              topRight:const Radius.circular(20),
+                  !me ? const Radius.circular(0) : const Radius.circular(20),
+              topRight: const Radius.circular(20),
               // me ? const Radius.circular(0) : const Radius.circular(20),
-              bottomRight: me ? const Radius.circular(0) : const Radius.circular(20),
+              bottomRight:
+                  me ? const Radius.circular(0) : const Radius.circular(20),
               bottomLeft: const Radius.circular(20),
             ),
           ),
@@ -66,28 +83,115 @@ class _MessageCardState extends State<MessageCard> {
             children: [
               widget.message.type == Type.text
                   ? Text(
-                widget.message.msg,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
-              )
+                      widget.message.msg,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    )
                   : ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: CachedNetworkImage(
-                  width: MediaQuery.of(context).size.height * .3,
-                  fit: BoxFit.cover,
-                  imageUrl: widget.message.msg,
-                  placeholder: (context, url) => const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
+                      borderRadius: BorderRadius.circular(20),
+                      child: CachedNetworkImage(
+                        width: MediaQuery.of(context).size.height * .3,
+                        fit: BoxFit.cover,
+                        imageUrl: widget.message.msg,
+                        placeholder: (context, url) => const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.image,
+                          size: 70,
+                        ),
+                      ),
+                    ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    myDateUtil.getFormattedTime(
+                        context: context, time: widget.message.sent),
+                    style: const TextStyle(
+                      color: Colors.white54,
+                      fontSize: 12,
+                    ),
                   ),
-                  errorWidget: (context, url, error) => const Icon(
-                    Icons.image,
-                    size: 70,
-                  ),
-                ),
+                  const SizedBox(width: 5),
+                  if (widget.message.read.isNotEmpty && me)
+                    Icon(
+                      Icons.done_all,
+                      color: seenIconColor,
+                      size: 17,
+                    ),
+                ],
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReplyMessage(Color? bgColor, Alignment alignment,
+      Color seenIconColor, bool me, Color contColor) {
+    if (widget.message.read.isEmpty) {
+      APIs.updateMessageReadStatus(widget.message);
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: widget.message.type == Type.image ? 4 : 8,
+        vertical: widget.message.type == Type.image ? 1 : 4,
+      ),
+      child: Align(
+        alignment: alignment,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8,
+          ),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.only(
+              topLeft:
+                  !me ? const Radius.circular(0) : const Radius.circular(20),
+              topRight: const Radius.circular(20),
+              // me ? const Radius.circular(0) : const Radius.circular(20),
+              bottomRight:
+                  me ? const Radius.circular(0) : const Radius.circular(20),
+              bottomLeft: const Radius.circular(20),
+            ),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildReply(me, contColor),
+              widget.message.type == Type.text
+                  ? Text(
+                      widget.message.msg,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: CachedNetworkImage(
+                        width: MediaQuery.of(context).size.height * .3,
+                        fit: BoxFit.cover,
+                        imageUrl: widget.message.msg,
+                        placeholder: (context, url) => const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.image,
+                          size: 70,
+                        ),
+                      ),
+                    ),
               const SizedBox(height: 20),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -139,24 +243,24 @@ class _MessageCardState extends State<MessageCard> {
               ),
               widget.message.type == Type.text
                   ? ListTile(
-                  leading: const Icon(Icons.copy_all, color: Colors.blue),
-                  title: const Text('Copy',
-                      style: TextStyle(color: Colors.white)),
-                  onTap: () async {
-                    await Clipboard.setData(
-                        ClipboardData(text: widget.message.msg))
-                        .then((value) {
-                      Navigator.pop(context);
-                      Dailogs.showSnackbar(context, 'Text Copied!');
-                    });
-                  })
+                      leading: const Icon(Icons.copy_all, color: Colors.blue),
+                      title: const Text('Copy',
+                          style: TextStyle(color: Colors.white)),
+                      onTap: () async {
+                        await Clipboard.setData(
+                                ClipboardData(text: widget.message.msg))
+                            .then((value) {
+                          Navigator.pop(context);
+                          Dailogs.showSnackbar(context, 'Text Copied!');
+                        });
+                      })
                   : ListTile(
-                  leading: const Icon(Icons.download, color: Colors.blue),
-                  title: const Text('Save image',
-                      style: TextStyle(color: Colors.white)),
-                  onTap: () {
-                    // Implement image saving functionality
-                  }),
+                      leading: const Icon(Icons.download, color: Colors.blue),
+                      title: const Text('Save image',
+                          style: TextStyle(color: Colors.white)),
+                      onTap: () {
+                        // Implement image saving functionality
+                      }),
               if (widget.message.type == Type.text && me)
                 ListTile(
                     leading: const Icon(Icons.edit, color: Colors.blue),
@@ -181,10 +285,10 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue),
                   title: widget.message.read.isNotEmpty
                       ? Text(
-                      'Seen at ${myDateUtil.getMessageTime(context: context, time: widget.message.read)}',
-                      style: const TextStyle(color: Colors.white))
+                          'Seen at ${myDateUtil.getMessageTime(context: context, time: widget.message.read)}',
+                          style: const TextStyle(color: Colors.white))
                       : const Text('Unseen',
-                      style: TextStyle(color: Colors.white)),
+                          style: TextStyle(color: Colors.white)),
                   onTap: () {
                     Navigator.pop(context);
                   }),
@@ -277,4 +381,58 @@ class _MessageCardState extends State<MessageCard> {
           );
         });
   }
+
+  Widget buildReply(bool isMe, Color contColor) => Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            color: contColor, //.withOpacity(.2),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              Container(
+                color: widget.message.rId == widget.user.id
+                    ? Color(0xFF87CEFA)
+                    : Color(0xFF90EE90),
+                width: 4,
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.message.rId == widget.user.id
+                            ? widget.user.name
+                            : "You",
+                        style: TextStyle(
+                            color: widget.message.rId == widget.user.id
+                                ? Color(0xFF87CEFA)
+                                : Color(0xFF90EE90)),
+                      ),
+                      //Spacer(),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 6,
+                  ),
+                  Row(
+                    children: [
+                      if (widget.message.rMsg == "Photo") Icon(Icons.photo),
+                      Text(
+                        widget.message.rMsg,
+                        style: TextStyle(color: Colors.white60),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
 }

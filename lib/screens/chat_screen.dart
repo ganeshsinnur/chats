@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +7,7 @@ import 'package:google_mlkit_smart_reply/google_mlkit_smart_reply.dart' as rely;
 import 'package:image_picker/image_picker.dart';
 import 'package:intellichat/models/chat_user.dart';
 import 'package:intellichat/widgets/message_card.dart';
+import 'package:swipe_to/swipe_to.dart';
 import '../api/apis.dart';
 import '../helper/my_date.dart';
 import '../models/message.dart';
@@ -28,6 +28,14 @@ class _ChatScreenState extends State<ChatScreen> {
   final _textController = TextEditingController();
   bool _isUploading = false;
   final _smartReply = rely.SmartReply();
+  final focusNode = FocusNode();
+  late Message replyMessage;
+  String rMessage = '';
+  String rId = "";
+
+  //bool isReply = false;
+
+  ///replyMessage!=null;
 
   @override
   void dispose() {
@@ -48,92 +56,109 @@ class _ChatScreenState extends State<ChatScreen> {
             automaticallyImplyLeading: false,
             flexibleSpace: _appBar(),
           ),
-          body: Column(
-            children: [
-              Expanded(
-                child: StreamBuilder(
-                  stream: APIs.getAllMesseages(widget.user),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                    //if data is loading
-                      case ConnectionState.waiting:
-                      case ConnectionState.none:
-                        return const Center(
-                            child: CircularProgressIndicator());
-
-                    //if some or all data is loaded then show it
-                      case ConnectionState.active:
-                      case ConnectionState.done:
-                        final data = snapshot.data?.docs;
-                        _list = data
-                            ?.map((e) => Message.fromJson(e.data()))
-                            .toList() ?? [];
-                        _list.sort((b, a) => a.sent.compareTo(b.sent));
-
-                        if (_list.isNotEmpty) {
-
-                          return ListView.builder(
-                            reverse: true,
-                            padding: EdgeInsets.only(
-                                top: MediaQuery.of(context).size.height *
-                                    0.01),
-                            itemCount: _list.length,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              addMsgtoReply(_list[index]); // Add messages to SmartReply
-                              getSuggestions();
-                              return MessageCard(message: _list[index]);
-                            },
-                          );
-                        } else {
+          body: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/bg.jpeg"),
+                    fit: BoxFit.cover)),
+            child: Column(
+              children: [
+                Expanded(
+                  child: StreamBuilder(
+                    stream: APIs.getAllMesseages(widget.user),
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        //if data is loading
+                        case ConnectionState.waiting:
+                        case ConnectionState.none:
                           return const Center(
-                            child: Text(
-                              "Say Hello",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.blue,
-                                  fontSize: 20),
-                            ),
-                          );
-                        }
-                    }
-                  },
-                ),
-              ),
-              if (_isUploading)
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
-                    child: CupertinoActivityIndicator(
-                      animating: true,
-                      radius: 30,
-                      color: Colors.blue,
-                    ),
+                              child: CircularProgressIndicator());
+
+                        //if some or all data is loaded then show it
+                        case ConnectionState.active:
+                        case ConnectionState.done:
+                          final data = snapshot.data?.docs;
+                          _list = data
+                                  ?.map((e) => Message.fromJson(e.data()))
+                                  .toList() ??
+                              [];
+                          _list.sort((b, a) => a.sent.compareTo(b.sent));
+                          replyMessage = _list[0];
+
+                          if (_list.isNotEmpty) {
+                            return ListView.builder(
+                              reverse: true,
+                              padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).size.height *
+                                      0.01),
+                              itemCount: _list.length,
+                              physics: const BouncingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                addMsgtoReply(
+                                    _list[index]); // Add messages to SmartReply
+                                getSuggestions();
+                                return SwipeTo(
+                                    onRightSwipe: (details) {
+                                      onSwipedmessage(_list[index]);
+                                    },
+                                    child: MessageCard(
+                                      message: _list[index],
+                                      user: widget.user,
+                                    ));
+                              },
+                            );
+                          } else {
+                            return const Center(
+                              child: Text(
+                                "Say Hello",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.blue,
+                                    fontSize: 20),
+                              ),
+                            );
+                          }
+                      }
+                    },
                   ),
                 ),
-              StreamBuilder(
-                stream: APIs.getAllMesseages(widget.user),
-                builder: (context, snapshot) {
-                  //getSuggestions();
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                    child: (Replies.isNotEmpty)
-                        ? Row(
-                      children: [
-                        chip(Replies[0]),
-                        const SizedBox(width: 5),
-                        chip(Replies[1]),
-                        const SizedBox(width: 5),
-                        chip(Replies[2]),
-                      ],
-                    )
-                        : null,
-                  );
-                },
-              ),
-              _chatInput(),
-            ],
+                if (_isUploading)
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+                      child: CupertinoActivityIndicator(
+                        animating: true,
+                        radius: 30,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                StreamBuilder(
+                  stream: APIs.getAllMesseages(widget.user),
+                  builder: (context, snapshot) {
+                    //getSuggestions();
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: (Replies.isNotEmpty)
+                          ? Row(
+                              children: [
+                                chip(Replies[0]),
+                                const SizedBox(width: 5),
+                                chip(Replies[1]),
+                                const SizedBox(width: 5),
+                                chip(Replies[2]),
+                              ],
+                            )
+                          : null,
+                    );
+                  },
+                ),
+                _chatInput(focusNode),
+              ],
+            ),
           ),
         ),
       ),
@@ -155,7 +180,7 @@ class _ChatScreenState extends State<ChatScreen> {
               const end = Offset.zero;
               const curve = Curves.ease;
               var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
               return SlideTransition(
                 position: animation.drive(tween),
                 child: child,
@@ -187,7 +212,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   height: mq.height * 0.05,
                   imageUrl: list.isNotEmpty ? list[0].image : widget.user.image,
                   placeholder: (context, url) =>
-                  const CircularProgressIndicator(),
+                      const CircularProgressIndicator(),
                   errorWidget: (context, url, error) => const CircleAvatar(
                       child: Icon(CupertinoIcons.person_crop_square)),
                 ),
@@ -204,18 +229,23 @@ class _ChatScreenState extends State<ChatScreen> {
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
-                  Text(
-                    list.isNotEmpty
-                        ? list[0].isOnline
-                        ? 'Online'
-                        : myDateUtil.getLastActiveTime(
-                        context: context,
-                        lastActive: list[0].lastActive)
-                        : myDateUtil.getLastActiveTime(
-                        context: context,
-                        lastActive: widget.user.lastActive),
-                    style: const TextStyle(color: Colors.white70, fontSize: 10),
-                  )
+                  list.isNotEmpty
+                      ? list[0].isOnline
+                          ? Text('Online',
+                              style: const TextStyle(
+                                  color: Colors.green, fontSize: 12))
+                          : Text(
+                              myDateUtil.getLastActiveTime(
+                                  context: context,
+                                  lastActive: list[0].lastActive),
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 10))
+                      : Text(
+                          myDateUtil.getLastActiveTime(
+                              context: context,
+                              lastActive: widget.user.lastActive),
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 10)),
                 ],
               )
             ],
@@ -225,7 +255,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _chatInput() {
+  Widget _chatInput(FocusNode focusNode) {
     var mq = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -238,57 +268,69 @@ class _ChatScreenState extends State<ChatScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               elevation: 1,
-              child: Row(
+              child: Column(
                 children: [
-                  SizedBox(width: mq.width * .05),
-                  Expanded(
-                    child: TextField(
-                      onTap: () {},
-                      controller: _textController,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: "Say Hello...",
-                        hintStyle: TextStyle(color: Color(0xFF64B4EF)),
-                        border: InputBorder.none,
+                  if (rMessage.isNotEmpty) buildReply(replyMessage),
+                  Row(
+                    children: [
+                      SizedBox(width: mq.width * .05),
+                      Expanded(
+                        child: TextField(
+                          focusNode: focusNode,
+                          //onTap: () {},
+                          controller: _textController,
+                          keyboardType: TextInputType.multiline,
+                          minLines: 1,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            hintText: "Say Hello...",
+                            hintStyle: TextStyle(color: Color(0xFF64B4EF)),
+                            border: InputBorder.none,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      final ImagePicker picker = ImagePicker();
-                      final List<XFile>? images =
-                      await picker.pickMultiImage(imageQuality: 80);
-                      if (images != null && images.isNotEmpty) {
-                        setState(() {
-                          _isUploading = true;
-                        });
-                        for (var i in images) {
-                          await APIs.sendChatImage(widget.user, File(i.path));
-                        }
-                        setState(() {
-                          _isUploading = false;
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.photo, color: Color(0xFFB1CDE7)),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      final ImagePicker picker = ImagePicker();
-                      final XFile? image = await picker.pickImage(
-                          source: ImageSource.camera, imageQuality: 80);
-                      if (image != null) {
-                        setState(() {
-                          _isUploading = true;
-                        });
-                        await APIs.sendChatImage(widget.user, File(image.path));
-                        setState(() {
-                          _isUploading = false;
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.camera_alt, color: Color(0xFF64B4EF)),
+                      IconButton(
+                        onPressed: () async {
+                          final ImagePicker picker = ImagePicker();
+                          final List<XFile>? images =
+                              await picker.pickMultiImage(imageQuality: 80);
+                          if (images != null && images.isNotEmpty) {
+                            setState(() {
+                              _isUploading = true;
+                            });
+                            for (var i in images) {
+                              await APIs.sendChatImage(
+                                  widget.user, File(i.path), rMessage, rId);
+                            }
+                            cancelReply();
+                            setState(() {
+                              _isUploading = false;
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.photo, color: Color(0xFFB1CDE7)),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera, imageQuality: 80);
+                          if (image != null) {
+                            setState(() {
+                              _isUploading = true;
+                            });
+                            await APIs.sendChatImage(
+                                widget.user, File(image.path), rMessage, rId);
+                            cancelReply;
+                            setState(() {
+                              _isUploading = false;
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.camera_alt,
+                            color: Color(0xFF64B4EF)),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -298,14 +340,21 @@ class _ChatScreenState extends State<ChatScreen> {
           MaterialButton(
             onPressed: () {
               if (_textController.text.isNotEmpty) {
-                APIs.sendMessage(widget.user, _textController.text, Type.text);
-                _textController.clear();
-                //getSuggestions();
+                if (_list.isEmpty) {
+                  //on first message (add user to my_user collection of chat user)
+                  APIs.sendFirstMessage(widget.user, _textController.text,
+                      Type.text, rMessage, rId);
+                } else {
+                  //simply send message
+                  APIs.sendMessage(widget.user, _textController.text, Type.text,
+                      rMessage, rId);
+                }
+                _textController.text = '';
               }
             },
             minWidth: 0,
             padding:
-            const EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 5),
+                const EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 5),
             shape: const CircleBorder(),
             color: const Color(0xFF64B4EF),
             child: const Icon(Icons.send, color: Colors.black),
@@ -320,8 +369,17 @@ class _ChatScreenState extends State<ChatScreen> {
     return Expanded(
       child: GestureDetector(
           onTap: () {
-            APIs.sendMessage(widget.user, label, Type.text);
+            if (_list.isEmpty) {
+              //on first message (add user to my_user collection of chat user)
+              APIs.sendFirstMessage(
+                  widget.user, _textController.text, Type.text, rMessage, rId);
+            } else {
+              //simply send message
+              APIs.sendMessage(
+                  widget.user, _textController.text, Type.text, rMessage, rId);
+            }
             getSuggestions();
+            cancelReply();
           },
           child: Chip(label: Center(child: Text(label)))),
     );
@@ -331,12 +389,9 @@ class _ChatScreenState extends State<ChatScreen> {
     // Fetch suggestions using Google ML Kit and rebuild page
     List oldSuggestions = Replies;
     final response = await _smartReply.suggestReplies();
-    log('curr Replies: $Replies');
+    //log('curr Replies: $Replies');
     Replies = response.suggestions;
-    for (final suggestion in response.suggestions) {
-      log('suggestion: $suggestion');
-    }
-    log('after Replies: $Replies');
+    //log('after Replies: $Replies');
     if (!listEquals(oldSuggestions, Replies)) {
       setState(() {});
     }
@@ -345,13 +400,90 @@ class _ChatScreenState extends State<ChatScreen> {
   void addMsgtoReply(Message message) {
     bool isMe = APIs.user.uid == message.fromId;
     if (isMe) {
-      log("isMe--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
+      //log("isMe--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
       _smartReply.addMessageToConversationFromLocalUser(
           message.msg, int.parse(message.sent));
     } else {
-      log("remote user--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
+      // log("remote user--> msg:${message.msg} timestamp:${myDateUtil.getTimeDate(context: context, time: message.sent)}");
       _smartReply.addMessageToConversationFromRemoteUser(
           message.msg, int.parse(message.sent), message.fromId);
     }
   }
+
+  onSwipedmessage(Message message) {
+    replyToMessage(message);
+    focusNode.requestFocus();
+  }
+
+  void replyToMessage(Message message) {
+    rId = message.fromId;
+    setState(() {
+      replyMessage = message;
+      rMessage = message.type == Type.text ? message.msg : "Photo";
+    });
+  }
+
+  void cancelReply() {
+    rId = "";
+    setState(() {
+      rMessage = '';
+      //replyMessage=null;
+    });
+  }
+
+  Widget buildReply(Message message) => Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            color: Color(0xCC5A5A5A), //.withOpacity(.2),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              Container(
+                color: widget.user.id == message.fromId
+                    ? Colors.blue
+                    : Colors.green,
+                width: 4,
+              ),
+              SizedBox(
+                width: 6,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.user.id == message.fromId
+                            ? widget.user.name
+                            : APIs.me.name,
+                        style: TextStyle(
+                            color: widget.user.id == message.fromId
+                                ? Colors.blue
+                                : Colors.green),
+                      ),
+                      //Spacer(),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 6,
+                  ),
+                  Row(
+                    children: [
+                      if (rMessage == "Photo") Icon(Icons.photo),
+                      Text(
+                        rMessage,
+                        style: TextStyle(color: Colors.white60),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              Spacer(),
+              GestureDetector(child: Icon(Icons.close), onTap: cancelReply)
+            ],
+          ),
+        ),
+      );
 }

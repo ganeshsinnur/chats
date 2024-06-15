@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intellichat/models/chat_user.dart';
 import 'package:intellichat/models/message.dart';
 
@@ -93,14 +94,16 @@ class APIs {
   }
 
   static Future<void> sendFirstMessage(
-      ChatUser chatUser, String msg, Type type) async {
+      ChatUser chatUser, String msg, Type type,String rMsg,String rId) async {
     await firestore
         .collection('users')
         .doc(chatUser.id)
         .collection('my_users')
         .doc(user.uid)
-        .set({}).then((value) => sendMessage(chatUser, msg, type));
+        .set({}).then((value) => sendMessage(chatUser, msg, type,rMsg,rId));
+    log("$firestore.collection('users').doc(chatUser.id).collection('my_users').doc(user.uid).set({}).then((value)");
   }
+
 
   //for updating user info
   static Future<void> updateUserInfo() async {
@@ -167,17 +170,22 @@ class APIs {
 
   //for sending messages
   static Future<void> sendMessage(
-      ChatUser Chatuser, String msg,Type type) async {
+      ChatUser Chatuser, String msg,Type type,String rMsg,String rId) async {
     // msg sending time
     final time = DateTime.now().millisecondsSinceEpoch.toString();
+    log("fromId --> $user.uid");
+    log("Conv id-->${getConversationID(Chatuser.id)}");
+    log("timeStamp--> $time");
 
     //message to send
     final Message message = Message(
+        rMsg: rMsg,
         msg: msg,
         read: '',
         told: Chatuser.id,
         type: type,
         fromId: user.uid,
+        rId: rId,
         sent: time);
 
     final ref = firestore
@@ -205,7 +213,7 @@ class APIs {
   }
 
   //send chat image
-  static Future<void> sendChatImage(ChatUser chatUser, File file) async {
+  static Future<void> sendChatImage(ChatUser chatUser, File file,String rMsg,String rId) async {
     //getting image file extension
     final ext = file.path.split('.').last;
 
@@ -221,7 +229,7 @@ class APIs {
 
     //updating image in database
     final imageUrl = await ref.getDownloadURL();
-    await sendMessage(chatUser, imageUrl, Type.image);
+    await sendMessage(chatUser, imageUrl, Type.image,rMsg,rId);
   }
 
   //delete message

@@ -24,31 +24,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //var mq=MediaQuery.of(context).size;
-    //var customTheme=0; //0 for dark; 1for light
 
 
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
     );
-    // return MaterialApp(
-    //
-    //     debugShowCheckedModeBanner: false,
-    //     title: 'Intelli Chat',
-    //     theme: ThemeData(
-    //         primarySwatch: Colors.blue,
-    //         appBarTheme: const AppBarTheme(
-    //             elevation: 1,
-    //             iconTheme: IconThemeData(color: Colors.black),
-    //             titleTextStyle: TextStyle(
-    //                 color: Colors.black,
-    //                 fontWeight: FontWeight.normal,
-    //                 fontSize: 19)
-    //         )),
-    //
-    //     home: const SplashScreen()//const MyHomePage(title: 'Flutter Demo Home Page'),
-    // );
   }
 }
 

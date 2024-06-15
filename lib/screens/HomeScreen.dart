@@ -1,16 +1,13 @@
-//import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:flutter/cupertino.dart';
-import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intellichat/screens/profile_screen.dart';
 import 'package:intellichat/widgets/chat_user_card.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../api/apis.dart';
 import '../helper/dailogs.dart';
 import '../models/chat_user.dart';
-
 class HomeScreen extends StatefulWidget {
 
   const HomeScreen({super.key,});
@@ -31,13 +28,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     APIs.getSelfInfo();
-    APIs.getSelfInfo();
+    //APIs.getSelfInfo();
 
     //for updating user active status according to lifecycle events
     //resume -- active or online
     //pause  -- inactive or offline
     SystemChannels.lifecycle.setMessageHandler((message) {
-      log('Message: $message');
+      //log('Message: $message');
 
       if (APIs.auth.currentUser != null) {
         if (message.toString().contains('resume')) {
@@ -54,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String? name = APIs.auth.currentUser?.displayName;
     var mq = MediaQuery.of(context).size;
     return GestureDetector(
       // for hiding keyboard
@@ -145,34 +143,30 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
-                UserAccountsDrawerHeader(
-                  decoration:  BoxDecoration(
-                    color: Colors.blueGrey[900],// Color(0xFF1C1C1C),
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey,
                   ),
-                  accountName:  const Text(
-                    " APIs.me.name",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  accountEmail:  const Text(
-                   " APIs.me.email",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                  currentAccountPicture: ClipRRect(
-                    borderRadius: BorderRadius.circular(70),
-                    child: CachedNetworkImage(
-                      fit: BoxFit.cover,
-                      imageUrl: "APIs.me.image",
-                      errorWidget: (context, url, error) =>
-                      const CircleAvatar(
-                        child: Icon(Icons.person),
-                      ),
+                  child:Center(
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 90,
+                          width: 90,
+                          child: Image.asset(
+                            'assets/images/email.png'
+                          ),
+                        ),
+                        SizedBox(width:10),
+                        Text("Intelli Chat",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                fontFamily: 'Sedan',
+                              fontSize: 27
+                            ))
+                      ],
                     ),
                   ),
                 ),
@@ -206,12 +200,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.person_add, color: Colors.grey),
-                  title: const Text('Invite (no func yet)', style: TextStyle(color: Colors.white38)),
+                  title: const Text('Invite', style: TextStyle(color: Colors.white)),
                   onTap: () {
-                    // Handle the tap
-                    //Navigator.pop(context);
+                    Navigator.pop(context);
+                    Share.share("Hey, my friend just created a new chat app from scratch! 🎉 "
+                        "\nWhy don't we test it out together and experience it firsthand? "
+                        "\nJoin me in a chat here: https://drive.google.com/drive/folders/1qpld0T33um21KpbAr8s-4TLsIsboaOT_");
                   },
                 ),
+
 
               ],
             ),

@@ -69,6 +69,9 @@ dependencies:
   #google ML-Kit
   google_mlkit_smart_reply: ^0.11.0
 #  smart_reply: ^0.1.0
+  swipe_to: ^1.0.6
+  share_plus: ^9.0.0
+
 
 dev_dependencies:
   flutter_test:
